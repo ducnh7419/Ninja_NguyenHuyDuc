@@ -29,7 +29,6 @@ public class Character : MonoBehaviour
 
     protected void ChangeAnim(string animName){
         if(animName!=currAnimName){
-            Debug.Log(animName);
             anim.ResetTrigger(animName);
             currAnimName=animName;
             anim.SetTrigger(currAnimName);          
@@ -49,7 +48,6 @@ public class Character : MonoBehaviour
                 OnDeath();
             }
             healthBar.setNewHp(hp);
-            Debug.Log(transform.position);
             Instantiate(combatTextPrefab,transform.position+Vector3.up,Quaternion.identity).OnInit(damage);
         }
     }

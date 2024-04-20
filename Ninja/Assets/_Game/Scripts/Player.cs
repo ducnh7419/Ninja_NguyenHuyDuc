@@ -12,6 +12,7 @@ public class Player : Character
     private bool isGrounded=false;
     private bool isJumping;
     private bool isAttack;
+    private bool isRunning;
     private float horizontal;
     [SerializeField] private float speed=5;
     [SerializeField]private float jumpForce;
@@ -34,8 +35,9 @@ public class Player : Character
             return;
         }
         isGrounded=CheckGrounded();
-        // horizontal=Input.GetAxisRaw("Horizontal");       
+        horizontal=Input.GetAxisRaw("Horizontal");
         if(isGrounded){
+            Debug.Log("G");
             if(isJumping){
                 return;
             }
@@ -51,7 +53,6 @@ public class Player : Character
 
             //attack
             if(Input.GetKeyDown(KeyCode.C)){
-                Debug.Log("Atk");
                 Attack();
             }
             //throw
@@ -65,22 +66,30 @@ public class Player : Character
                 isJumping=false;
         }
 
+        if(isRunning&&isGrounded){
+            if(Input.GetKeyDown(KeyCode.DownArrow)){
+                Slide();
+            }
+        }
+
         //Moving
         if(Mathf.Abs(horizontal)>0.1f){
             rb.velocity=new Vector2(horizontal*Time.deltaTime*speed,rb.velocity.y);
             //horizontal>0=> tra ve 0, con khong thi tra ve 180
             transform.rotation=Quaternion.Euler(new Vector3(0,horizontal>0 ? 0 : 180,0));
             // transform.localScale=new Vector3(horizontal,1,1);
+            isRunning=true;
         }else if(isGrounded){
             ChangeAnim("idle");
             rb.velocity=Vector2.zero;
+            isRunning=false;
         }
     }
 
     override public void OnInit(){
         base.OnInit();
-        Debug.Log(isGrounded);
         ChangeAnim("idle");
+        isRunning=false;
         attackArea.SetActive(false);
         isAttack=false;             
         transform.position=savePoint;
@@ -110,15 +119,27 @@ public class Player : Character
     }
 
     private bool CheckGrounded(){
-        Debug.DrawLine(transform.position,transform.position+Vector3.down*1.1f,Color.red);
-        RaycastHit2D hit= Physics2D.Raycast(transform.position,Vector3.down,1.1f,groundLayer);
+        Debug.DrawLine(transform.position,transform.position+Vector3.down*0.85f,Color.red);
+        RaycastHit2D hit= Physics2D.Raycast(transform.position,Vector3.down,0.85f,groundLayer);
         return hit.collider!=null;
     }
 
     public void Jump(){
         isJumping=true;
         ChangeAnim("jump");
-        rb.AddForce(jumpForce*Vector2.up);  
+        rb.AddForce(jumpForce*Vector2.up);
+    }
+
+    public void Slide(){
+        ChangeAnim("slide");
+        transform.rotation=Quaternion.Euler(new Vector3(0,0,90));
+        rb.velocity=new Vector2(horizontal*Time.deltaTime*speed,rb.velocity.y);
+        Invoke(nameof(ResetSlide),1f);
+    }
+
+    private void ResetSlide(){
+        ChangeAnim("idle");
+        transform.rotation=Quaternion.Euler(Vector3.zero);
     }
 
     public void Attack(){
@@ -151,6 +172,7 @@ public class Player : Character
 
     public void SetMove(float horizontal){
         this.horizontal=horizontal;
+        isRunning=true;
     }
 
 

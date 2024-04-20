@@ -50,6 +50,7 @@ public class Enemy : Character
             ChangeState(new AttackState());
         }else{
             if(Target!=null){
+                Debug.Log("C");
                 ChangeState(new PatrolState());
             }else{
                 ChangeState(new IdleState());

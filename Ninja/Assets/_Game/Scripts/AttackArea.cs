@@ -5,8 +5,7 @@ using UnityEngine;
 public class AttackArea : MonoBehaviour
 {
     // Start is called before the first frame update
-    private void OnTriggerEnter2D(Collider2D collision) {       
-        Debug.Log(collision.tag);
+    private void OnTriggerEnter2D(Collider2D collision) {    
         if(collision.CompareTag("Player")||collision.CompareTag("Enemy")){
             collision.GetComponent<Character>().OnHit(30f);
         }
